@@ -1,0 +1,33 @@
+{
+	"geode": "4.4.0",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "nwo5.better_volume",
+	"name": "Better Volume",
+	"version": "v1.0.0",
+	"developer": "Nwo5",
+	"description": "Like the alpha mod kinda but pauselayer.",
+	"tags": ["customization", "utility", "enhancement"],
+	"resources": {"sprites": ["resources/*.png"]},
+	"settings": {
+		"colored-bars": {
+			"type": "bool",
+			"name": "Colored Bars",
+			"default": true
+		},
+		"music-color": {
+			"type": "rgb",
+			"name": "Music Color",
+			"default": "#007dff"
+		},
+		"sfx-color": {
+			"type": "rgb",
+			"name": "SFX Color",
+			"default": "#00ff7b"
+		}
+	}
+}
