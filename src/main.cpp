@@ -39,8 +39,8 @@ class $modify(PauseMenu, PauseLayer) {
             }
 
             auto input = TextInput::create(50.0f, "0");
-            input->setPosition(sliderType ? ccp(200.0f, 75.0f) : ccp(393.0f, 75.0f)); // hard coded positions bite me
-            input->setScale(0.5f);
+            input->setPosition(sliderType ? ccp(musicText->getPositionX() + 16, musicText->getPositionY()) : ccp(sfxText->getPositionX() + 9, sfxText->getPositionY())); // hard coded positions bite me
+            input->setScale(0.65f);
             input->setFilter("1234567890.");
             input->setCallback([slider, sliderType] (const std::string& input) {
                 if (!input.empty()) {
