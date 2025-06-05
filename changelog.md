@@ -1,3 +1,6 @@
+## v1.0.3
+- **Fixed** dumb hook
+
 ## v1.0.2
 - **Added** source
 

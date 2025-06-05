@@ -66,7 +66,7 @@ class $modify(PauseMenu, PauseLayer) {
     }
 
     void sfxSliderChanged(CCObject* p0) {
-        PauseLayer::musicSliderChanged(p0);
+        PauseLayer::sfxSliderChanged(p0);
         updateInputWithSlider(m_fields->sfxInput, m_fields->sfxSlider);
     }
 
