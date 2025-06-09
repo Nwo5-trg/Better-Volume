@@ -3,10 +3,6 @@
 
 using namespace geode::prelude;
 
-auto mod = Mod::get();
-
-CCTexture2D* colorableSliderTexture = CCTextureCache::sharedTextureCache()->addImage("sliderBar2.png", true);
-
 class $modify(PauseMenu, PauseLayer) {
     struct Fields {
         TextInput* musicInput;
@@ -14,9 +10,12 @@ class $modify(PauseMenu, PauseLayer) {
         Slider* musicSlider;
         Slider* sfxSlider;
 
-        bool colorBars = mod->getSettingValue<bool>("colored-bars");
-        ccColor3B musicColor = mod->getSettingValue<ccColor3B>("music-color");
-        ccColor3B sfxColor =  mod->getSettingValue<ccColor3B>("sfx-color");
+        bool colorBars = Mod::get()->getSettingValue<bool>("colored-bars");
+        ccColor3B musicColor = Mod::get()->getSettingValue<ccColor3B>("music-color");
+        ccColor3B sfxColor =  Mod::get()->getSettingValue<ccColor3B>("sfx-color");
+        int64_t rounding =  Mod::get()->getSettingValue<int64_t>("rounding");
+        std::string musicCustomText = Mod::get()->getSettingValue<std::string>("music-text");
+        std::string sfxCustomText = Mod::get()->getSettingValue<std::string>("sfx-text");
     };
 
     void customSetup() {
@@ -29,7 +28,10 @@ class $modify(PauseMenu, PauseLayer) {
         auto fields = m_fields.self();
         fields->musicSlider = musicSlider;
         fields->sfxSlider = sfxSlider;
-        for (auto text : {musicText, sfxText}) text->setString((std::string(text->getString()) + "      %").c_str());
+
+        CCTexture2D* colorableSliderTexture = CCTextureCache::sharedTextureCache()->addImage("sliderBar2.png", true);
+        musicText->setString((fields->musicCustomText + "      %").c_str());
+        sfxText->setString((fields->sfxCustomText + "      %").c_str());
         for (auto slider : {musicSlider, sfxSlider}) {
             auto sliderType = (slider == musicSlider);
 
@@ -72,12 +74,13 @@ class $modify(PauseMenu, PauseLayer) {
 
     void updateInputWithSlider(TextInput* input, Slider* slider) {
         if (!input || !slider) return;
-        input->setString(floatToFormattedString(slider->getValue() * 100));
+        input->setString(ftofstr(slider->getValue() * 100, m_fields->rounding));
     }
 
-    std::string floatToFormattedString(float num) {
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(1) << num;
+    std::string ftofstr(float num, int decimal) { // see i need this i added customizable rounding this is def not just justification for attachment issues to lines of fucking code even tho it would literally be less lines of code to switch case fmtformat
+        if (decimal == 0) return std::to_string((int)round(num));
+        std::ostringstream ss;
+        ss << std::fixed << std::setprecision(decimal) << num;
         std::string string = ss.str();
         string.erase(string.find_last_not_of('0') + 1, std::string::npos);
         if (string.back() == '.') string.pop_back();

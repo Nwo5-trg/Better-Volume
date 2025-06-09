@@ -8,12 +8,11 @@
 	},
 	"id": "nwo5.better_volume",
 	"name": "Better Volume",
-	"version": "v1.0.3",
+	"version": "v1.0.4",
 	"developer": "Nwo5",
 	"description": "Like the alpha mod kinda but pauselayer.",
 	"tags": ["customization", "utility", "enhancement"],
 	"links": {"source": "https://github.com/Nwo5-trg/Better-Volume"},
-	"resources": {"sprites": ["resources/*.png"]},
 	"settings": {
 		"colored-bars": {
 			"type": "bool",
@@ -29,6 +28,23 @@
 			"type": "rgb",
 			"name": "SFX Color",
 			"default": "#00ff7b"
+		},
+		"rounding": {
+			"type": "int",
+			"name": "Input Rounding",
+			"default": 1,
+			"min": 0,
+			"max": 5
+		},
+		"music-text": {
+			"type": "string",
+			"name": "Music Text",
+			"default": "Music"
+		},
+		"sfx-text": {
+			"type": "string",
+			"name": "SFX Text",
+			"default": "SFX"
 		}
 	}
 }
