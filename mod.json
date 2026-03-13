@@ -31,23 +31,6 @@
 			"type": "rgb",
 			"name": "SFX Color",
 			"default": "#00ff7b"
-		},
-		"rounding": {
-			"type": "int",
-			"name": "Input Rounding",
-			"default": 1,
-			"min": 0,
-			"max": 5
-		},
-		"music-text": {
-			"type": "string",
-			"name": "Music Text",
-			"default": "Music"
-		},
-		"sfx-text": {
-			"type": "string",
-			"name": "SFX Text",
-			"default": "SFX"
 		}
 	}
 }
