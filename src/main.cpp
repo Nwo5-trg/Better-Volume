@@ -1,90 +1,95 @@
 #include <Geode/Geode.hpp>
-#include <Geode/modify//PauseLayer.hpp>
+#include <Geode/modify/PauseLayer.hpp>
+#include <Geode/modify/OptionsLayer.hpp>
 
 using namespace geode::prelude;
 
-class $modify(PauseMenu, PauseLayer) {
-    struct Fields {
-        TextInput* musicInput;
-        TextInput* sfxInput;
-        Slider* musicSlider;
-        Slider* sfxSlider;
+std::string getStr(float val) {
+    return std::to_string(static_cast<int>(std::round(val * 100.f)));
+}
 
-        bool colorBars = Mod::get()->getSettingValue<bool>("colored-bars");
-        ccColor3B musicColor = Mod::get()->getSettingValue<ccColor3B>("music-color");
-        ccColor3B sfxColor =  Mod::get()->getSettingValue<ccColor3B>("sfx-color");
-        int64_t rounding =  Mod::get()->getSettingValue<int64_t>("rounding");
-        std::string musicCustomText = Mod::get()->getSettingValue<std::string>("music-text");
-        std::string sfxCustomText = Mod::get()->getSettingValue<std::string>("sfx-text");
+template <typename T>
+void setupVolumeUI(T* layer, Slider*& mSl, Slider*& sSl, TextInput*& mIn, TextInput*& sIn) {
+    auto mod = Mod::get();
+    bool doColor = mod->getSettingValue<bool>("colored-bars");
+    auto mCol = mod->getSettingValue<ccColor3B>("music-color");
+    auto sCol = mod->getSettingValue<ccColor3B>("sfx-color");
+    auto tex = CCTextureCache::sharedTextureCache()->addImage("sliderBar2.png", true);
+
+    mSl = typeinfo_cast<Slider*>(layer->getChildByIDRecursive("music-slider"));
+    sSl = typeinfo_cast<Slider*>(layer->getChildByIDRecursive("sfx-slider"));
+    auto mLbl = typeinfo_cast<CCLabelBMFont*>(layer->getChildByIDRecursive("music-label"));
+    auto sLbl = typeinfo_cast<CCLabelBMFont*>(layer->getChildByIDRecursive("sfx-label"));
+
+    if (!mSl || !sSl || !mLbl || !sLbl) return;
+
+    auto setupInput = [&](Slider* sl, CCLabelBMFont* lbl, TextInput*& in, ccColor3B col, bool isM) {
+        if (doColor && tex) { sl->m_sliderBar->setTexture(tex); sl->m_sliderBar->setColor(col); }
+
+        lbl->setPositionX(lbl->getPositionX() - 22.f);
+        sl->setZOrder(1);
+
+        in = TextInput::create(40.f, "0");
+        in->setPosition(lbl->getPositionX() + lbl->getScaledContentSize().width / 2.f + 20.f, lbl->getPositionY());
+        in->setScale(0.65f);
+        in->setFilter("1234567890");
+        in->setString(getStr(sl->getValue()));
+
+        in->setCallback([layer, sl, isM](const std::string& val) {
+            if (val.empty()) return;
+            sl->setValue(std::clamp(std::strtof(val.c_str(), nullptr), 0.f, 100.f) / 100.f);
+            sl->updateBar();
+            isM ? layer->musicSliderChanged(sl->m_touchLogic->m_thumb) : layer->sfxSliderChanged(sl->m_touchLogic->m_thumb);
+        });
+
+        if (auto p = lbl->getParent()) {
+            p->addChild(in);
+
+            auto pct = CCLabelBMFont::create("%", lbl->getFntFile());
+            pct->setPosition(in->getPositionX() + 28.f, in->getPositionY());
+            pct->setScale(lbl->getScale());
+            p->addChild(pct);
+        }
     };
+
+    setupInput(mSl, mLbl, mIn, mCol, true);
+    setupInput(sSl, sLbl, sIn, sCol, false);
+}
+
+class $modify(MyPauseLayer, PauseLayer) {
+    struct Fields { TextInput* mIn; TextInput* sIn; Slider* mSl; Slider* sSl; };
 
     void customSetup() {
         PauseLayer::customSetup();
-        auto musicSlider = this->getChildByType<Slider>(0);
-        auto sfxSlider = this->getChildByType<Slider>(1);
-        auto musicText = this->getChildByType<CCLabelBMFont>(5);
-        auto sfxText = this->getChildByType<CCLabelBMFont>(6);
-        if (!musicSlider || !sfxSlider || !musicText || !sfxText) return;
-        auto fields = m_fields.self();
-        fields->musicSlider = musicSlider;
-        fields->sfxSlider = sfxSlider;
-
-        CCTexture2D* colorableSliderTexture = CCTextureCache::sharedTextureCache()->addImage("sliderBar2.png", true);
-        musicText->setString((fields->musicCustomText + "      %").c_str());
-        sfxText->setString((fields->sfxCustomText + "      %").c_str());
-        for (auto slider : {musicSlider, sfxSlider}) {
-            auto sliderType = (slider == musicSlider);
-
-            if (fields->colorBars) {
-                slider->m_sliderBar->setTexture(colorableSliderTexture);
-                slider->m_sliderBar->setColor(sliderType ? fields->musicColor : fields->sfxColor);
-            }
-
-            auto input = TextInput::create(50.0f, "0");
-            input->setPosition(sliderType ? ccp(musicText->getPositionX() + 16, musicText->getPositionY()) : ccp(sfxText->getPositionX() + 9, sfxText->getPositionY())); // hard coded positions bite me
-            input->setScale(0.65f);
-            input->setFilter("1234567890.");
-            input->setCallback([slider, sliderType] (const std::string& input) {
-                if (!input.empty()) {
-                    auto value = std::strtof(input.c_str(), nullptr);
-                    if (value <= 100) {
-                        slider->setValue(value / 100);
-                        slider->updateBar();
-                        if (sliderType) FMODAudioEngine::get()->setBackgroundMusicVolume(value / 100);
-                        else FMODAudioEngine::get()->setEffectsVolume(value / 100);
-                    }
-                }
-            });
-            (sliderType ? fields->musicInput : fields->sfxInput) = input;
-            this->addChild(input);
-        }
-        updateInputWithSlider(fields->musicInput, musicSlider);
-        updateInputWithSlider(fields->sfxInput, sfxSlider);
+        setupVolumeUI(this, m_fields->mSl, m_fields->sSl, m_fields->mIn, m_fields->sIn);
     }
 
     void musicSliderChanged(CCObject* p0) {
         PauseLayer::musicSliderChanged(p0);
-        updateInputWithSlider(m_fields->musicInput, m_fields->musicSlider);
+        if (m_fields->mIn && m_fields->mSl) m_fields->mIn->setString(getStr(m_fields->mSl->getValue()));
     }
 
     void sfxSliderChanged(CCObject* p0) {
         PauseLayer::sfxSliderChanged(p0);
-        updateInputWithSlider(m_fields->sfxInput, m_fields->sfxSlider);
-    }
-
-    void updateInputWithSlider(TextInput* input, Slider* slider) {
-        if (!input || !slider) return;
-        input->setString(ftofstr(slider->getValue() * 100, m_fields->rounding));
-    }
-
-    std::string ftofstr(float num, int decimal) { // see i need this i added customizable rounding this is def not just justification for attachment issues to lines of fucking code even tho it would literally be less lines of code to switch case fmtformat
-        if (decimal == 0) return std::to_string((int)round(num));
-        std::ostringstream ss;
-        ss << std::fixed << std::setprecision(decimal) << num;
-        std::string string = ss.str();
-        string.erase(string.find_last_not_of('0') + 1, std::string::npos);
-        if (string.back() == '.') string.pop_back();
-        return string;
+        if (m_fields->sIn && m_fields->sSl) m_fields->sIn->setString(getStr(m_fields->sSl->getValue()));
     }
 };
 
+class $modify(MyOptionsLayer, OptionsLayer) {
+    struct Fields { TextInput* mIn; TextInput* sIn; Slider* mSl; Slider* sSl; };
+
+    void customSetup() {
+        OptionsLayer::customSetup();
+        setupVolumeUI(this, m_fields->mSl, m_fields->sSl, m_fields->mIn, m_fields->sIn);
+    }
+
+    void musicSliderChanged(CCObject* p0) {
+        OptionsLayer::musicSliderChanged(p0);
+        if (m_fields->mIn && m_fields->mSl) m_fields->mIn->setString(getStr(m_fields->mSl->getValue()));
+    }
+
+    void sfxSliderChanged(CCObject* p0) {
+        OptionsLayer::sfxSliderChanged(p0);
+        if (m_fields->sIn && m_fields->sSl) m_fields->sIn->setString(getStr(m_fields->sSl->getValue()));
+    }
+};
