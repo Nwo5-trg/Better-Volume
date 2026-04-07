@@ -85,15 +85,6 @@ static void setupSlider(bool pIsMusic, CCNode* pLayer, geode::CopyableFunction<v
         return;
     }
 
-    auto muteButtonMenu = CCMenu::create();
-    muteButtonMenu->setID(pIsMusic ? "music-mute-menu"_spr : "sfx-mute-menu"_spr);
-    muteButtonMenu->setContentSize(CCSizeZero);
-    muteButtonMenu->setPosition(
-        labelMenu->getPositionX() + (slider->m_groove->getScaledContentWidth() * slider->getScale()) / 2,
-        labelMenu->getPositionY()
-    );
-    parent->addChild(muteButtonMenu);
-
     auto muteToggle = CCMenuItemExt::createTogglerWithFrameName("GJ_musicOffBtn_001.png", "GJ_musicOnBtn_001.png", 0.5f, [=] (CCMenuItemToggler* pSender) {
         const auto muted = !Mod::get()->getSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted");
 
@@ -125,7 +116,29 @@ static void setupSlider(bool pIsMusic, CCNode* pLayer, geode::CopyableFunction<v
     muteToggle->setID(pIsMusic ? "music-mute-toggle"_spr : "sfx-mute-toggle"_spr);
     muteToggle->toggle(Mod::get()->getSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted"));
     muteToggle->setPosition(CCPointZero);
+
+    auto muteButtonMenu = CCMenu::create();
+    muteButtonMenu->setID(pIsMusic ? "music-mute-menu"_spr : "sfx-mute-menu"_spr);
+    muteButtonMenu->setContentSize(muteToggle->getScaledContentSize());
     muteButtonMenu->addChild(muteToggle);
+    parent->addChild(muteButtonMenu);
+
+    if (Mod::get()->getSettingValue<bool>("mute-button-on-right")) {
+        muteButtonMenu->setPosition(
+            slider->getPositionX() + ((slider->m_groove->getScaledContentWidth() * slider->getScale()) + 10.0f) / 2,
+            slider->getPositionY()
+        );
+        slider->setPosition(
+            slider->getPositionX() - (muteButtonMenu->getScaledContentWidth() + 10.0f) / 2,
+            slider->getPositionY()
+        );
+    }
+    else {
+        muteButtonMenu->setPosition(
+            labelMenu->getPositionX() + (slider->m_groove->getScaledContentWidth() * slider->getScale()) / 2,
+            labelMenu->getPositionY()
+        );
+    }
 }
 
 static void tryUpdateMuteButton(CCLayer* pLayer, bool pIsMusic) {

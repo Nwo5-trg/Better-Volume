@@ -43,6 +43,11 @@
 			"name": "Mute Button",
 			"default": true
 		},
+		"mute-button-on-right": {
+			"type": "bool",
+			"name": "Mute Button On Right",
+			"default": true
+		},
 		"music-text": {
 			"type": "string",
 			"name": "Music Text",
