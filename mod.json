@@ -17,7 +17,8 @@
 		"community": "https://discord.gg/AeFeYWGUxZ"
 	},
 	"dependencies": {
-		"geode.node-ids": ">=1.23.1"
+		"geode.node-ids": ">=1.23.1",
+		"nwo5.silly-api": ">=1.1.0"
 	},
 	"incompatibilities": {
 		"alphalaneous.volume_input": ">=v1.0.0"

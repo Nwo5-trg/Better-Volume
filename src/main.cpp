@@ -1,11 +1,12 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PauseLayer.hpp>
 #include <Geode/modify/OptionsLayer.hpp>
+#include <nwo5.silly-api/include/utils/include.hpp>
 
 using namespace geode::prelude;
 
 static std::string getVolumeStr(float pVal) {
-    return utils::numToString(pVal * 100, Mod::get()->getSettingValue<int>("input-precision"));
+    return nwo5::utils::numToString(pVal * 100, Mod::get()->getSettingValue<int>("input-precision"));
 }
 
 // callback cuz i lowkey wanna add volume sliders to editor pause eventually and thisll make it far easier
