@@ -5,7 +5,7 @@
 using namespace geode::prelude;
 
 static std::string getVolumeStr(float pVal) {
-    return utils::numToString(static_cast<int>(std::round(pVal * 100)), Mod::get()->getSettingValue<int>("input-precision"));
+    return utils::numToString(std::round(pVal * 100), Mod::get()->getSettingValue<int>("input-precision"));
 }
 
 // callback cuz i lowkey wanna add volume sliders to editor pause eventually and thisll make it far easier
