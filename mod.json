@@ -20,7 +20,7 @@
 		"geode.node-ids": ">=1.23.1"
 	},
 	"incompatibilities": {
-		"alphalaneous.volume_input": "*"
+		"alphalaneous.volume_input": ">=v1.0.0"
 	},
 	"settings": {
 		"colored-bars": {
