@@ -8,7 +8,7 @@
 	},
 	"id": "nwo5.better_volume",
 	"name": "Better Volume",
-	"version": "v2.0.0",
+	"version": "v2.0.1",
 	"developers": ["Nwo5","lyyako"],
 	"description": "like the alpha mod kinda but cooler :3c",
 	"tags": ["offline", "enhancement", "interface", "utility", "customization"],
@@ -37,6 +37,13 @@
 			"type": "rgb",
 			"name": "SFX Color",
 			"default": "#00ff7b"
+		},
+		"input-precision": {
+			"type": "int",
+			"name": "Input Precision",
+			"min": 0,
+			"max": 5,
+			"default": 2
 		},
 		"mute-button": {
 			"type": "bool",

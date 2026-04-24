@@ -1,3 +1,7 @@
+## v2.0.1
+- **Added** back input precision
+- **Added** better mute button sprites
+
 ## v2.0.0
 - **Added** 2.208 support
 - **Added** this whole thing to the main menu options layer too (apparently people change volume outside of levels, who knew)

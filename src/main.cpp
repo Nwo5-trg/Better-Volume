@@ -5,7 +5,7 @@
 using namespace geode::prelude;
 
 static std::string getVolumeStr(float pVal) {
-    return utils::numToString(static_cast<int>(std::round(pVal * 100)));
+    return utils::numToString(static_cast<int>(std::round(pVal * 100)), Mod::get()->getSettingValue<int>("input-precision"));
 }
 
 // callback cuz i lowkey wanna add volume sliders to editor pause eventually and thisll make it far easier
@@ -44,7 +44,7 @@ static void setupSlider(bool pIsMusic, CCNode* pLayer, geode::CopyableFunction<v
     pInputPtr->setFilter(".1234567890");
     pInputPtr->setString(getVolumeStr(slider->getValue()));
     pInputPtr->setCallback([=] (const std::string& pStr) {
-        // prolly not the best solutoon but it does work :3
+        // prolly not the best solution but it does work :3
         if (pStr.empty() || pStr.ends_with('.')) {
             return;
         }
@@ -85,7 +85,7 @@ static void setupSlider(bool pIsMusic, CCNode* pLayer, geode::CopyableFunction<v
         return;
     }
 
-    auto muteToggle = CCMenuItemExt::createTogglerWithFrameName("GJ_musicOffBtn_001.png", "GJ_musicOnBtn_001.png", 0.5f, [=] (CCMenuItemToggler* pSender) {
+    auto muteToggle = CCMenuItemExt::createTogglerWithFrameName("GJ_fxOffBtn_001.png", "GJ_fxOnBtn_001.png", 0.5f, [=] (CCMenuItemToggler* pSender) {
         const auto muted = !Mod::get()->getSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted");
 
         if (muted) {
