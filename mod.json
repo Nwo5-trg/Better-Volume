@@ -27,7 +27,6 @@
 		"enable-mod": {
 			"type": "bool",
 			"name": "Enable Mod",
-			"description": "Toggles the mod on or off",
 			"default": true
 		},
 
@@ -38,7 +37,6 @@
 		"input-precision": {
 			"type": "int",
 			"name": "Input Precision",
-			"description": "How many decimal places to show in the input",
 			"min": 0,
 			"max": 5,
 			"default": 0
@@ -46,19 +44,16 @@
 		"swap-sliders": {
 			"type": "bool",
 			"name": "Swap Sliders",
-			"description": "Swaps the Music and SFX sliders",
 			"default": false
 		},
 		"mute-button": {
 			"type": "bool",
 			"name": "Mute Button",
-			"description": "Adds a mute button next to the sliders",
 			"default": true
 		},
 		"mute-button-on-right": {
 			"type": "bool",
 			"name": "Mute Button On Right",
-			"description": "Places the mute button on the right side of the slider",
 			"default": true,
 			"enable-if": "mute-button"
 		},
@@ -70,33 +65,28 @@
 		"colored-bars": {
 			"type": "bool",
 			"name": "Colored Bars",
-			"description": "Gives the slider bars a custom color",
 			"default": true
 		},
 		"music-color": {
 			"type": "rgb",
 			"name": "Music Color",
-			"description": "Sets the color for the Music slider",
 			"default": "#007dff",
 			"enable-if": "colored-bars"
 		},
 		"sfx-color": {
 			"type": "rgb",
 			"name": "SFX Color",
-			"description": "Sets the color for the SFX slider",
 			"default": "#00ff7b",
 			"enable-if": "colored-bars"
 		},
 		"music-text": {
 			"type": "string",
 			"name": "Custom Music Text",
-			"description": "Custom text for the Music slider",
 			"default": "Music"
 		},
 		"sfx-text": {
 			"type": "string",
 			"name": "Custom SFX Text",
-			"description": "Custom text for the SFX slider",
 			"default": "SFX"
 		}
 	}
