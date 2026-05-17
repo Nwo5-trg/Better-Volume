@@ -18,7 +18,7 @@
 	},
 	"dependencies": {
 		"geode.node-ids": ">=1.23.3",
-		"nwo5.silly-api": ">=1.3.0"
+		"nwo5.silly-api": ">=1.4.1"
 	},
 	"incompatibilities": {
 		"alphalaneous.volume_input": ">=v1.0.0"
