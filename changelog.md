@@ -1,3 +1,11 @@
+## v2.1.1
+- **Fixed** rewrote allow low volume w/ my own impl that also fixes a bug
+
+- **Removed** v2.1.0 colon handling because i wanted a way to remove them for my own ui :3
+
+- **Internal** cleaned up the code cuz 1 file as getting kinda messy
+- **Internal** use my api a bit more heavily
+
 ## v2.1.0
 - **Added** option to swap Music and SFX sliders
 - **Added** function to disable RobTop's 'feature' that snaps volume to 0 below 3% (thanks to ***Eclipse Menu Team***)
