@@ -1,3 +1,6 @@
+## v2.1.3
+- **Fixed** how do i manage to fuck up versioning for both silly api and this on the same day \<\/3
+
 ## v2.1.2
 - **Fixed** filter im stupid oopsies
 
