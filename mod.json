@@ -85,12 +85,14 @@
 		"music-text": {
 			"type": "string",
 			"name": "Custom Music Text",
-			"default": "Music:"
+			"default": "Music:",
+			"filter": "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`1234567890-=[]\\;',./~!@#$%^&*()_+{}|:\"<>?"
 		},
 		"sfx-text": {
 			"type": "string",
 			"name": "Custom SFX Text",
-			"default": "SFX:"
+			"default": "SFX:",
+			"filter": "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`1234567890-=[]\\;',./~!@#$%^&*()_+{}|:\"<>?"
 		}
 	}
 }

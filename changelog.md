@@ -1,3 +1,6 @@
+## v2.1.2
+- **Fixed** filter im stupid oopsies
+
 ## v2.1.1
 - **Fixed** rewrote allow low volume w/ my own impl that also fixes a bug
 
