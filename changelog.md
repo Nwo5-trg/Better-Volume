@@ -6,7 +6,7 @@
 
 - **Removed** v2.1.0 colon handling because i wanted a way to remove them for my own ui :3
 
-- **Internal** cleaned up the code cuz 1 file as getting kinda messy
+- **Internal** cleaned up the code cuz 1 file was getting kinda messy
 - **Internal** use my api a bit more heavily
 
 ## v2.1.0
