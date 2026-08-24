@@ -1,3 +1,6 @@
+## v2.1.5
+- port to new sillyapi version
+
 ## v2.1.4
 **Fixed**
 

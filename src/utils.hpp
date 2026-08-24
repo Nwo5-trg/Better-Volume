@@ -9,7 +9,7 @@ using namespace nwo5::ui::prelude;
 constexpr bool MUSIC = true;
 constexpr bool SFX = false;
 
-namespace Utils {
+namespace BetterVolume {
     void setupSlider(
         bool pIsMusic, cocos2d::CCNode* pLayer,
         geode::CopyableFunction<void(cocos2d::CCObject*)> pCallback, 

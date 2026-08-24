@@ -8,33 +8,33 @@ using namespace geode::prelude;
 
 template<typename T>
 static void musicSliderChangedHook(CCObject* pSender, T* pLayer) {
-    const auto volume = Utils::getVolume(pSender);
+    const auto volume = BetterVolume::getVolume(pSender);
 
-    Utils::setVolume(MUSIC, volume);
+    BetterVolume::setVolume(MUSIC, volume);
 
     if (Settings::enabled) {
         auto fields = pLayer->m_fields.self();
 
         if (fields->m_musicInput) {
-            fields->m_musicInput->setString(Utils::formatVolumeStr(volume));
+            fields->m_musicInput->setString(BetterVolume::formatVolumeStr(volume));
 
-            Utils::tryUpdateMuteButton(MUSIC, pLayer);
+            BetterVolume::tryUpdateMuteButton(MUSIC, pLayer);
         }
     }
 }
 template<typename T>
 static void sfxSliderChangedHook(CCObject* pSender, T* pLayer) {
-    const auto volume = Utils::getVolume(pSender);
+    const auto volume = BetterVolume::getVolume(pSender);
     
-    Utils::setVolume(SFX, volume);
+    BetterVolume::setVolume(SFX, volume);
 
     if (Settings::enabled) {
         auto fields = pLayer->m_fields.self();
 
         if (fields->m_sfxInput) {
-            fields->m_sfxInput->setString(Utils::formatVolumeStr(volume));
+            fields->m_sfxInput->setString(BetterVolume::formatVolumeStr(volume));
 
-            Utils::tryUpdateMuteButton(SFX, pLayer);
+            BetterVolume::tryUpdateMuteButton(SFX, pLayer);
         }
     }
 }
@@ -79,30 +79,21 @@ class $modify(PauseLayer) {
 		const float musicShift = Settings::swapSliders ? HORIZONTAL_SHIFT : -HORIZONTAL_SHIFT;
 		const float sfxShift = Settings::swapSliders ? -HORIZONTAL_SHIFT : HORIZONTAL_SHIFT;
 
-		if (auto musicSliderNode = this->getChildByIDRecursive("music-slider")) {
-			musicSliderNode->setPositionX(musicSliderNode->getPositionX() + musicShift);
-		}
-		if (auto musicLabelNode = this->getChildByIDRecursive("music-label")) {
-			musicLabelNode->setPositionX(musicLabelNode->getPositionX() + musicShift);
-		}
-
-		if (auto sfxSliderNode = this->getChildByIDRecursive("sfx-slider")) {
-			sfxSliderNode->setPositionX(sfxSliderNode->getPositionX() + sfxShift);
-		}
-		if (auto sfxLabelNode = this->getChildByIDRecursive("sfx-label")) {
-			sfxLabelNode->setPositionX(sfxLabelNode->getPositionX() + sfxShift);
-		}
+        musicSlider->setPositionX(ui::x(musicSlider) + musicShift);
+        musicLabel->setPositionX(ui::x(musicLabel) + musicShift);
+        sfxSlider->setPositionX(ui::x(sfxSlider) + sfxShift);
+        sfxLabel->setPositionX(ui::x(sfxLabel) + sfxShift);
 		
 		auto fields = m_fields.self();
 
-		Utils::setupSlider(
+		BetterVolume::setupSlider(
             MUSIC, this, 
             [this] (CCObject* pSender) {
                 musicSliderChanged(pSender);
             }, 
             fields->m_musicInput, fields->m_musicSlider
         );
-		Utils::setupSlider(SFX, this,
+		BetterVolume::setupSlider(SFX, this,
             [this] (CCObject* pSender) { 
                 sfxSliderChanged(pSender);
             }, 
@@ -154,14 +145,14 @@ class $modify(OptionsLayer) {
 
 		auto fields = m_fields.self();
 
-		Utils::setupSlider(
+		BetterVolume::setupSlider(
             MUSIC, this, 
             [this] (CCObject* pSender) {
                 musicSliderChanged(pSender);
             },
             fields->m_musicInput, m_musicSlider
         );
-		Utils::setupSlider(
+		BetterVolume::setupSlider(
             SFX, this,
             [this] (CCObject* pSender) {
                 sfxSliderChanged(pSender);
@@ -171,11 +162,11 @@ class $modify(OptionsLayer) {
 	}
 
 	void musicSliderChanged(CCObject* pSender) {
-        const auto wasMuted = Utils::getVolume(MUSIC) <= 0.0f;
+        const auto wasMuted = BetterVolume::getVolume(MUSIC) <= 0.0f;
 
 		musicSliderChangedHook(pSender, this);
 
-        if (wasMuted && 0.0f < Utils::getVolume(MUSIC)) {
+        if (wasMuted && 0.0f < BetterVolume::getVolume(MUSIC)) {
             GameManager::get()->playMenuMusic();
         }
 	}
@@ -186,3 +177,7 @@ class $modify(OptionsLayer) {
         }
     #endif
 };
+
+$on_mod(Loaded) {
+    SettingsManager::get()->load();
+}

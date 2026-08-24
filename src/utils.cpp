@@ -3,7 +3,7 @@
 
 using namespace geode::prelude;
 
-namespace Utils {
+namespace BetterVolume {
     void setupSlider(
         bool pIsMusic, CCNode* pLayer,
         CopyableFunction<void(CCObject*)> pCallback, 
@@ -26,11 +26,6 @@ namespace Utils {
 
         label->setVisible(false);
 
-        auto newLabel = ui::node(Setup(ui::label(pIsMusic ? Settings::musicText.get() : Settings::sfxText.get(), label->getFntFile()))
-            .id(pIsMusic ? "music-label"_spr : "sfx-label"_spr)
-            .scale(label)
-        );
-
         if (Settings::coloredBars) {
             if (auto sliderTexture = CCTextureCache::sharedTextureCache()->addImage("sliderBar2.png", true)) {
                 slider->m_sliderBar->setTexture(sliderTexture);
@@ -38,108 +33,108 @@ namespace Utils {
             }
         }
 
-        pInputPtr = ui::node(Setup(ui::input(40.0f, "0"))
-            .id(pIsMusic ? "music-input"_spr : "sfx-input"_spr)
-            .scale(0.65f)
-            .filter("0123456789.")
-            .string(Utils::formatVolumeStr(slider->getValue()))
-            .callback([=] (const std::string& pStr) {
-                if (pStr.empty() || pStr.ends_with('.') || pStr.starts_with('.')) {
-                    return;
-                }
-
-                auto result = utils::numFromString<float>(pStr);
-                if (!result) {
-                    return;
-                }
-
-                auto newValue = std::clamp(result.unwrapOr(0.0f), 0.0f, 100.0f) / 100;
-                slider->setValue(newValue);
-                slider->updateBar();
-                pCallback(slider->m_touchLogic->m_thumb);
-            })
-        );
-
-        auto percentLabel = ui::node(Setup(ui::label("%", label->getFntFile()))
-            .id(pIsMusic ? "music-percent-label"_spr : "sfx-percent-label"_spr)
-            .scale(label)
-        );
-
         auto parent = slider->getParent();
 
         if (!parent) {
             return;
         }
 
-        auto labelMenu = ui::node(Setup(ui::menu(ui::horizontalDistrbLayout(5.0f, AxisAlignment::Center), false))
+        auto labelMenu = *ui::menu(ui::row()
+            .alignment(AxisAlignment::Center)
+            .gap(5.0f)
+            .autoScale(false)
+            .grow(true)
+        )
             .id(pIsMusic ? "music-label-menu"_spr : "sfx-label-menu"_spr)
             .pos(label)
             .size(CCSizeZero)
             .children(
-                newLabel,
-                pInputPtr,
-                percentLabel
+                ui::label(pIsMusic ? Settings::musicText.get() : Settings::sfxText.get(), label->getFntFile())
+                    .id(pIsMusic ? "music-label"_spr : "sfx-label"_spr)
+                    .scale(label),
+                ui::input(40.0f, "0")
+                    .id(pIsMusic ? "music-input"_spr : "sfx-input"_spr)
+                    .scale(0.65f)
+                    .filter("0123456789.")
+                    .string(BetterVolume::formatVolumeStr(slider->getValue()))
+                    .callback([=] (const std::string& pStr) {
+                        if (pStr.empty() || pStr.ends_with('.') || pStr.starts_with('.')) {
+                            return;
+                        }
+
+                        auto result = utils::numFromString<float>(pStr);
+                        if (!result) {
+                            return;
+                        }
+
+                        auto newValue = std::clamp(result.unwrapOr(0.0f), 0.0f, 100.0f) / 100;
+                        slider->setValue(newValue);
+                        slider->updateBar();
+                        pCallback(slider->m_touchLogic->m_thumb);
+                    }),
+                ui::label("%", label->getFntFile())
+                    .id(pIsMusic ? "music-percent-label"_spr : "sfx-percent-label"_spr)
+                    .scale(label)
             )
-            .parent(parent)
-        );;
+            .parent(parent);
 
         if (!Settings::muteButton) {
             return;
         }
 
-        auto muteToggle = ui::node(Setup(ui::togglerFrame(
-                pIsMusic ? "GJ_musicOffBtn_001.png" : "GJ_fxOffBtn_001.png",
-                pIsMusic ? "GJ_musicOnBtn_001.png" : "GJ_fxOnBtn_001.png",
-                nullptr, 0.5f, 0.5f
-            ))
-                .id(pIsMusic ? "music-mute-toggle"_spr : "sfx-mute-toggle"_spr)
-                .toggle(Mod::get()->getSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted"))
-                .pos(CCPointZero)
-                .callback([=] (CCMenuItemToggler* pSender) {
-                    const auto muted = !Mod::get()->getSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted");
+        auto muteToggle = *ui::togglerFrame(
+            pIsMusic ? "GJ_musicOffBtn_001.png" : "GJ_fxOffBtn_001.png",
+            pIsMusic ? "GJ_musicOnBtn_001.png" : "GJ_fxOnBtn_001.png",
+            nullptr, 0.5f, 0.5f
+        )
+            .id(pIsMusic ? "music-mute-toggle"_spr : "sfx-mute-toggle"_spr)
+            .toggle(Mod::get()->getSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted"))
+            .pos(CCPointZero)
+            .callback([=] (CCMenuItemToggler* pSender) {
+                const auto muted = !Mod::get()->getSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted");
 
-                    if (muted) {
-                        Mod::get()->setSavedValue<float>(pIsMusic ? "music-volume-ret" : "sfx-volume-ret", slider->getValue());
+                if (muted) {
+                    Mod::get()->setSavedValue<float>(pIsMusic ? "music-volume-ret" : "sfx-volume-ret", slider->getValue());
 
-                        slider->setValue(0.0f);
-                        slider->updateBar();
+                    slider->setValue(0.0f);
+                    slider->updateBar();
 
-                        pCallback(slider->m_touchLogic->m_thumb);
-                    } else {
-                        slider->setValue(
-                            Mod::get()->getSavedValue<float>(pIsMusic ? "music-volume-ret" : "sfx-volume-ret")
-                        );
-                        slider->updateBar();
-                        
-                        pCallback(slider->m_touchLogic->m_thumb);
-
-                        pSender->toggle(true);
-                    }
+                    pCallback(slider->m_touchLogic->m_thumb);
+                } else {
+                    slider->setValue(
+                        Mod::get()->getSavedValue<float>(pIsMusic ? "music-volume-ret" : "sfx-volume-ret")
+                    );
+                    slider->updateBar();
                     
-                    Mod::get()->setSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted", muted);
-                })
-        );
+                    pCallback(slider->m_touchLogic->m_thumb);
 
-        auto muteButtonMenu = ui::node(Setup(ui::menu(false))
+                    pSender->toggle(true);
+                }
+                
+                Mod::get()->setSavedValue<bool>(pIsMusic ? "music-muted" : "sfx-muted", muted);
+            });
+
+        auto muteButtonMenu = *ui::menu(false)
             .id(pIsMusic ? "music-mute-menu"_spr : "sfx-mute-menu"_spr)
             .size(CCSizeZero)
-            .children(muteToggle)
-            .parent(parent)
-        );
+            .children(
+                muteToggle
+            )
+            .parent(parent);
 
         if (Settings::muteButtonOnRight) {
             muteButtonMenu->setPosition(
-                slider->getPositionX() + (slider->m_groove->getScaledContentWidth() + 10.0f) / 2,
-                slider->getPositionY()
+                ui::x(slider) + (ui::sw(slider->m_groove) + 10.0f) / 2,
+                ui::y(slider)
             );
             slider->setPosition(
-                slider->getPositionX() - (muteToggle->getScaledContentWidth() + 10.0f) / 2,
-                slider->getPositionY()
+                ui::x(slider) - (ui::sw(muteToggle) + 10.0f) / 2,
+                ui::y(slider)
             );
         } else {
             muteButtonMenu->setPosition(
-                labelMenu->getPositionX() + (slider->m_groove->getScaledContentWidth() * slider->getScale()) / 2,
-                labelMenu->getPositionY()
+                ui::x(labelMenu) + (ui::sw(slider->m_groove) * slider->getScale()) / 2,
+                ui::y(labelMenu)
             );
         }
     }
@@ -172,7 +167,7 @@ namespace Utils {
             fmod->setEffectsVolume(pVolume);
         }
     }
-    float getVolume(cocos2d::CCObject* pSender) {
+    float getVolume(CCObject* pSender) {
         if (auto thumb = typeinfo_cast<SliderThumb*>(pSender)) {
             return thumb->getValue();
         }
@@ -187,6 +182,6 @@ namespace Utils {
     }
 
     std::string formatVolumeStr(float pVal) {
-        return nwo5::utils::numToString(pVal * 100, Settings::inputPrecision);
+        return misc::numToString(pVal * 100, Settings::inputPrecision);
     }
 }
