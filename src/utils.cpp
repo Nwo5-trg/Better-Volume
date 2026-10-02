@@ -39,6 +39,27 @@ namespace BetterVolume {
             return;
         }
 
+        pInputPtr = ui::input(40.0f, "0")
+            .id(pIsMusic ? "music-input"_spr : "sfx-input"_spr)
+            .scale(0.65f)
+            .filter("0123456789.")
+            .string(BetterVolume::formatVolumeStr(slider->getValue()))
+            .callback([=] (const std::string& pStr) {
+                if (pStr.empty() || pStr.ends_with('.') || pStr.starts_with('.')) {
+                    return;
+                }
+
+                auto result = utils::numFromString<float>(pStr);
+                if (!result) {
+                    return;
+                }
+
+                auto newValue = std::clamp(result.unwrapOr(0.0f), 0.0f, 100.0f) / 100;
+                slider->setValue(newValue);
+                slider->updateBar();
+                pCallback(slider->m_touchLogic->m_thumb);
+            });
+
         auto labelMenu = *ui::menu(ui::row()
             .alignment(AxisAlignment::Center)
             .gap(5.0f)
@@ -52,26 +73,7 @@ namespace BetterVolume {
                 ui::label(pIsMusic ? Settings::musicText.get() : Settings::sfxText.get(), label->getFntFile())
                     .id(pIsMusic ? "music-label"_spr : "sfx-label"_spr)
                     .scale(label),
-                ui::input(40.0f, "0")
-                    .id(pIsMusic ? "music-input"_spr : "sfx-input"_spr)
-                    .scale(0.65f)
-                    .filter("0123456789.")
-                    .string(BetterVolume::formatVolumeStr(slider->getValue()))
-                    .callback([=] (const std::string& pStr) {
-                        if (pStr.empty() || pStr.ends_with('.') || pStr.starts_with('.')) {
-                            return;
-                        }
-
-                        auto result = utils::numFromString<float>(pStr);
-                        if (!result) {
-                            return;
-                        }
-
-                        auto newValue = std::clamp(result.unwrapOr(0.0f), 0.0f, 100.0f) / 100;
-                        slider->setValue(newValue);
-                        slider->updateBar();
-                        pCallback(slider->m_touchLogic->m_thumb);
-                    }),
+                pInputPtr,
                 ui::label("%", label->getFntFile())
                     .id(pIsMusic ? "music-percent-label"_spr : "sfx-percent-label"_spr)
                     .scale(label)

@@ -1,3 +1,8 @@
+## v2.1.6
+**Fixed**
+
+- slider not updating input
+
 ## v2.1.5
 **Added**
 
